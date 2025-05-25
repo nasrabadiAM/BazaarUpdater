@@ -8,7 +8,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -20,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,12 +34,12 @@ import com.farsitel.bazaar.updater.BazaarUpdater
 import com.farsitel.bazaar.updater.UpdateResult
 
 class MainActivity : ComponentActivity() {
+    private val referrerViewModel by viewModels<ReferrerViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val referrerViewModel by viewModels<ReferrerViewModel>()
             val referrerContent by referrerViewModel.referrerContent.collectAsState()
             val errorMessage by referrerViewModel.errorMessage.collectAsState()
             BazaarupdaterSampleTheme {
@@ -52,6 +55,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        referrerViewModel.onResume()
     }
 }
 
@@ -131,18 +139,25 @@ private fun UpdateButton(
 
 @Composable
 private fun CheckUpdateStateView(context: Context, onResult: (UpdateResult) -> Unit) {
-    UpdateButton(context = context, onResult = onResult, text = stringResource(R.string.check_update))
+    UpdateButton(
+        context = context,
+        onResult = onResult,
+        text = stringResource(R.string.check_update)
+    )
 }
 
 @Composable
 private fun ReferrerSdkInfo(modifier: Modifier, error: String?, referrerContent: ReferrerDetails?) {
     Column(modifier.padding(24.dp)) {
         Text(text = "Referrer SDK Info")
-        Text(text = "error: $error")
         Text(text = "referrer.appVersion: ${referrerContent?.appVersion}")
         Text(text = "referrer.installBeginTimestampMilliseconds: ${referrerContent?.installBeginTimestampMilliseconds}")
         Text(text = "referrer.referrer: ${referrerContent?.referrer}")
         Text(text = "referrer.referrerClickTimestampMilliseconds: ${referrerContent?.referrerClickTimestampMilliseconds}")
+        if (error != null) {
+            Spacer(Modifier.height(16.dp))
+            Text(text = "error: $error", color = Color.Red)
+        }
     }
 }
 
