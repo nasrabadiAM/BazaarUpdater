@@ -1,6 +1,7 @@
 package com.farsitel.bazaar.bazaarupdaterSample.referrer
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cafebazaar.referrersdk.ReferrerClient
@@ -19,12 +20,14 @@ class ReferrerViewModel(application: Application) : AndroidViewModel(application
 
         override fun onReady() {
             viewModelScope.launch {
+                Log.e("BZRTAGD", "ReferrerViewModel onReady")
                 getAndConsumeReferrer()
             }
         }
 
         override fun onError(clientError: ClientError) {
             viewModelScope.launch {
+                Log.e("BZRTAGD", "onError clientError=$clientError")
                 handleReferrerError(clientError)
             }
         }
@@ -37,11 +40,13 @@ class ReferrerViewModel(application: Application) : AndroidViewModel(application
 
     fun onResume() {
         viewModelScope.launch(Dispatchers.IO) {
+            Log.e("BZRTAGD", "onResume startConnection")
             referrerClient.startConnection(stateListener)
         }
     }
 
     private suspend fun handleReferrerError(referrerError: ClientError) {
+        Log.e("BZRTAGD", "handleReferrerError referrerError=$referrerError, message=${referrerError.message}")
         when (referrerError) {
             ClientError.ERROR_BAZAAR_IS_NOT_INSTALL,
             ClientError.ERROR_BAZAAR_IS_NOT_COMPATIBLE,
@@ -61,11 +66,16 @@ class ReferrerViewModel(application: Application) : AndroidViewModel(application
     }
 
     private suspend fun getAndConsumeReferrer() {
+        Log.e("BZRTAGD", "getAndConsumeReferrer")
+
         referrerClient.getReferrerDetails()?.let { referrerDetails ->
+            Log.e("BZRTAGD", "getAndConsumeReferrer referrerDetails=$referrerDetails")
+
             _referrerContent.emit(referrerDetails)
             referrerClient.consumeReferrer(referrerDetails.installBeginTimestampMilliseconds)
             referrerClient.endConnection()
         } ?: run {
+            Log.e("BZRTAGD", "Referrer details in empty")
             _errorMessage.emit("THERE IS NO REFERRER")
         }
     }
