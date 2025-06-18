@@ -10,9 +10,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,16 +46,17 @@ class MainActivity : ComponentActivity() {
         setContent {
             val referrerContent by referrerViewModel.referrerContent.collectAsState()
             val errorMessage by referrerViewModel.errorMessage.collectAsState()
+            val logs by referrerViewModel.logs.collectAsState()
             BazaarupdaterSampleTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    UpdateScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                    ReferrerSdkInfo(
-                        modifier = Modifier.padding(innerPadding),
-                        error = errorMessage,
-                        referrerContent = referrerContent,
-                    )
+                    Column(Modifier.padding(innerPadding)) {
+                        UpdateScreen()
+                        ReferrerSdkInfo(
+                            error = errorMessage,
+                            logs = logs,
+                            referrerContent = referrerContent,
+                        )
+                    }
                 }
             }
         }
@@ -73,8 +78,10 @@ private fun UpdateScreen(
         updateState.value = result
     }
     Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = modifier
+            .padding(24.dp)
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center,
     ) {
         when (val state = updateState.value) {
             UpdateResult.AlreadyUpdated -> AlreadyUpdatedView()
@@ -147,26 +154,41 @@ private fun CheckUpdateStateView(context: Context, onResult: (UpdateResult) -> U
 }
 
 @Composable
-private fun ReferrerSdkInfo(modifier: Modifier, error: String?, referrerContent: ReferrerDetails?) {
+private fun ReferrerSdkInfo(
+    error: String?,
+    logs: String?,
+    referrerContent: ReferrerDetails?,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier.padding(24.dp)) {
-        Text(text = "Referrer SDK Info")
-        Text(text = "referrer.appVersion: ${referrerContent?.appVersion}")
-        Text(text = "referrer.installBeginTimestampMilliseconds: ${referrerContent?.installBeginTimestampMilliseconds}")
-        Text(text = "referrer.referrer: ${referrerContent?.referrer}")
-        Text(text = "referrer.referrerClickTimestampMilliseconds: ${referrerContent?.referrerClickTimestampMilliseconds}")
+        HorizontalDivider()
+        Text(text = "Referrer SDK Info: ")
+        Text(text = "appVersion= ${referrerContent?.appVersion}")
+        Text(text = "installBeginTimestampMilliseconds= ${referrerContent?.installBeginTimestampMilliseconds}")
+        Text(text = "referrer= ${referrerContent?.referrer}")
+        Text(text = "referrerClickTimestampMilliseconds= ${referrerContent?.referrerClickTimestampMilliseconds}")
         if (error != null) {
-            Spacer(Modifier.height(16.dp))
-            Text(text = "error: $error", color = Color.Red)
+            Spacer(Modifier.height(8.dp))
+            Text(text = "error= $error", color = Color.Red)
         }
+        Spacer(Modifier.height(16.dp))
+        HorizontalDivider()
+        Text(
+            modifier = Modifier.verticalScroll(rememberScrollState()),
+            text = logs.toString()
+        )
     }
 }
 
 private fun checkUpdateState(context: Context, onResult: (UpdateResult) -> Unit) {
     BazaarUpdater.getLastUpdateState(context = context) { result ->
         when (result) {
-            UpdateResult.AlreadyUpdated -> TODO()
-            is UpdateResult.Error -> TODO()
-            is UpdateResult.NeedUpdate -> result.targetVersion
+            UpdateResult.AlreadyUpdated -> onResult.invoke(result)
+            is UpdateResult.Error -> onResult.invoke(result)
+            is UpdateResult.NeedUpdate -> {
+                onResult.invoke(result)
+                result.targetVersion
+            }
         }
     }
 }
