@@ -12,8 +12,8 @@ android {
         applicationId = "com.farsitel.bazaar.bazaarupdaterSample"
         minSdk = 21
         targetSdk = 34
-        versionCode = 15
-        versionName = "1.5-referrer"
+        versionCode = 16
+        versionName = "1.6-referrer"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
