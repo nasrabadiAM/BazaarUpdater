@@ -1,18 +1,20 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.binary.compatibility.validator)
+    id("maven-publish")
 }
 
 android {
     namespace = "com.farsitel.bazaar.updater"
-    compileSdk = 34
+    compileSdk = 31
 
     buildFeatures {
         aidl = true
     }
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 19
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -33,15 +35,34 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += "-Xexplicit-api=strict"
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
 }
 
 dependencies {
 
-//    implementation(libs.androidx.core.ktx)
-//    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+
 }
+publishing {
+    publications {
+        create("release", MavenPublication::class) {
+            groupId = "com.farsitel.bazaar"
+            artifactId = "updater"
+            version = "1.0.0-beta1"
+
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
+}
+

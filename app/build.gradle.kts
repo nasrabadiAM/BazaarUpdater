@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -19,6 +18,13 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+    }
+
+    buildFeatures {
+        compose =  true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.5"
     }
 
     signingConfigs {
@@ -70,5 +76,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.bazaar.referrer.sdk)
 }
