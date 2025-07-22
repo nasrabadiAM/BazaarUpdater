@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -24,6 +26,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="ir.metrix.APPLICATION_ID"
+            android:value="uifiydhemxruzzq" />
+
+        <meta-data
+            android:name="ir.metrix.API_KEY"
+            android:value="d63d164a-23b6-4e8e-8a81-6e1ce16957d9" />
     </application>
 
 </manifest>

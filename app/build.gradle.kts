@@ -6,7 +6,11 @@ plugins {
 android {
     namespace = "com.farsitel.bazaar.bazaarupdaterSample"
     compileSdk = 34
-
+    packaging {
+        jniLibs {
+            excludes += "/lib/**/libconscrypt_jni.so"
+        }
+    }
     defaultConfig {
         applicationId = "com.farsitel.bazaar.bazaarupdaterSample"
         minSdk = 21
@@ -76,6 +80,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.metrix.analytics)
+    implementation(libs.metrix.attribution)
 
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.bazaar.referrer.sdk)

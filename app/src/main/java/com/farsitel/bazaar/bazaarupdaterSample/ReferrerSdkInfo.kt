@@ -35,9 +35,5 @@ fun ReferrerSdkInfo(
         }
         Spacer(Modifier.height(16.dp))
         HorizontalDivider()
-        Text(
-            modifier = Modifier.verticalScroll(rememberScrollState()),
-            text = logs.toString()
-        )
     }
 }
